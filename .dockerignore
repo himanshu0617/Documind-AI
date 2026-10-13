@@ -1,0 +1,28 @@
+# Git and IDE
+.git
+.vscode
+.idea
+
+# Environment and Secrets
+.env
+.env.*
+
+# Python cache and environments
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# FAISS local dumps and temporary files
+*.tmp
+vectorstore/
+uploads/
+data/
+*.pdf
+*.faiss
+*.pkl

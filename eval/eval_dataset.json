@@ -1,0 +1,93 @@
+{
+  "corpus": [
+    {
+      "filename": "documind_spec.pdf",
+      "pages": [
+        "DocuMind AI Architecture Specification.\nDocuMind AI is a Retrieval-Augmented Generation system designed for precision document question answering. It utilizes the sentence-transformers/all-MiniLM-L6-v2 embedding model to convert text chunks into 384-dimensional dense vectors.",
+        "Deduplication and Storage.\nAll document files are fingerprinted using SHA-256 content hashes to prevent redundant vector re-indexing. Vectors are stored in a FAISS index operating in memory. The default maximum upload size is 25 MB per document.",
+        "Scanned Document Handling and Vision.\nWhen an uploaded PDF contains 0 extractable digital text characters across its pages, DocuMind AI flags the document with an OCR requirement warning instead of generating hallucinated text. Standard PyMuPDF parsing requires a digital text layer."
+      ]
+    },
+    {
+      "filename": "security_and_privacy_policy.pdf",
+      "pages": [
+        "API Collection and Storage.\nThe FastAPI API maintains one process-wide default FAISS collection in memory shared by API callers. Streamlit UI session state is separate. The application does not implement authentication, user isolation, or persisted indexes.",
+        "Prompt Injection Safeguards.\nAll retrieved passages are treated as untrusted data inputs. Instructions embedded inside document text cannot override system instructions or alter assistant operational behavior."
+      ]
+    }
+  ],
+  "test_cases": [
+    {
+      "id": "TC-01",
+      "type": "answerable",
+      "question": "What embedding model is used by DocuMind AI?",
+      "target_document": "documind_spec.pdf",
+      "expected_source_substrings": ["sentence-transformers/all-MiniLM-L6-v2", "384-dimensional"],
+      "ground_truth_answer": "DocuMind AI uses sentence-transformers/all-MiniLM-L6-v2 to convert text chunks into 384-dimensional dense vectors.",
+      "description": "Direct factual extraction from architecture specification."
+    },
+    {
+      "id": "TC-02",
+      "type": "answerable",
+      "question": "How does DocuMind AI prevent duplicate re-indexing of documents?",
+      "target_document": "documind_spec.pdf",
+      "expected_source_substrings": ["SHA-256 content hashes", "redundant vector re-indexing"],
+      "ground_truth_answer": "It uses SHA-256 content hashes to fingerprint files and avoid redundant re-indexing.",
+      "description": "Factual query on deduplication mechanism."
+    },
+    {
+      "id": "TC-03",
+      "type": "answerable",
+      "question": "What happens when a scanned document with no digital text is uploaded?",
+      "target_document": "documind_spec.pdf",
+      "expected_source_substrings": ["OCR requirement warning", "0 extractable digital text"],
+      "ground_truth_answer": "DocuMind AI flags the document with an OCR requirement warning instead of hallucinating text.",
+      "description": "Validation of scanned document detection."
+    },
+    {
+      "id": "TC-04",
+      "type": "answerable",
+      "question": "How is the API collection shared?",
+      "target_document": "security_and_privacy_policy.pdf",
+      "expected_source_substrings": ["process-wide default FAISS collection", "shared by API callers"],
+      "ground_truth_answer": "The API has one process-wide default collection shared by API callers; it is not tenant-isolated.",
+      "description": "Retrieval of the documented single-collection API behavior."
+    },
+    {
+      "id": "TC-05",
+      "type": "unanswerable",
+      "question": "What is the stock market valuation of DocuMind Inc in 2029?",
+      "target_document": null,
+      "expected_source_substrings": [],
+      "ground_truth_answer": "The uploaded documents do not provide enough information to answer this question.",
+      "description": "Completely out-of-domain unanswerable question requiring model abstention."
+    },
+    {
+      "id": "TC-06",
+      "type": "unanswerable",
+      "question": "Who is the chief financial officer of the organization?",
+      "target_document": null,
+      "expected_source_substrings": [],
+      "ground_truth_answer": "The uploaded documents do not provide enough information to answer this question.",
+      "description": "Unanswerable query with no mentions of CFO in the corpus."
+    },
+    {
+      "id": "TC-07",
+      "type": "ambiguous",
+      "question": "What is the maximum limit?",
+      "target_document": "documind_spec.pdf",
+      "expected_source_substrings": ["25 MB"],
+      "ground_truth_answer": "The document specifies that the maximum file size is strictly capped at 25 MB per document.",
+      "description": "Ambiguous query referencing 'limit' without specifying file size, token, or chunk limit."
+    },
+    {
+      "id": "TC-08",
+      "type": "ambiguous",
+      "question": "How is security handled?",
+      "target_document": "security_and_privacy_policy.pdf",
+      "expected_source_substrings": ["untrusted data", "shared by API callers"],
+      "ground_truth_answer": "The API collection is shared by callers, and retrieved passages are treated as untrusted data to mitigate prompt injection.",
+      "description": "Broad ambiguous query touching multiple security dimensions."
+    }
+  ]
+}
